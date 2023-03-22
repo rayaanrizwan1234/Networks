@@ -5,30 +5,36 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class Server 
-{
-	// created hashmap for items 
+/*
+ * The server class implements a server that accepts socket connections from clients on port 6420
+ * It also uses an executor to have a fixed thread pool 30
+ * maintains a hashmap of items to store bids. It creates a ClientHandler object to handl;e each client connection
+ * and does the processing for the client through the client handler. Also creates a log file to keep track of requeusts
+*/
+
+public class Server {
+	// created hashmap for items
 	private HashMap<String, Bid> items = new HashMap<String, Bid>(); // Creating a hashmap named 'items' to store bids
 
 	private ServerSocket severSocket; // initializing the server socket
 
-	public Server(){
-		try{
+	public Server() {
+		try {
 			severSocket = new ServerSocket(6420); // creating the ServerSocket object on 6420
 		}
 		// if it is unable to work then it catches exception
-		catch(IOException e) {
+		catch (IOException e) {
 			System.err.println("Could not listen on port: 6420");
 			System.exit(0);
 		}
 	}
 
-	// method to run server 
-	public void runServer() { 
+	// method to run server
+	public void runServer() {
 		// Creating a new Executor object with a fixed thread pool of size 30
-        Executor executor = Executors.newFixedThreadPool(30);
+		Executor executor = Executors.newFixedThreadPool(30);
 		// creating a new FileWriter object
-		FileWriter logWriter = null; 
+		FileWriter logWriter = null;
 
 		try {
 			// creates a log.txt files
@@ -41,13 +47,13 @@ public class Server
 
 		try {
 			// infinite loop
-			while (true){
-			// creating a new socket object
-			Socket clientSocket = severSocket.accept();
-			// prints out the port number of the client
-            System.out.println("clientSocket port: " + clientSocket.getPort() );
-			// executes the ClientHandler class
-			executor.execute(new ClientHandler(clientSocket, items, logWriter));
+			while (true) {
+				// creating a new socket object
+				Socket clientSocket = severSocket.accept();
+				// prints out the port number of the client
+				System.out.println("clientSocket port: " + clientSocket.getPort());
+				// executes the ClientHandler class
+				executor.execute(new ClientHandler(clientSocket, items, logWriter));
 			}
 		}
 		// if it is unable to work then it catches exception
@@ -64,8 +70,7 @@ public class Server
 		}
 	}
 
-	public static void main( String[] args )
-	{
+	public static void main(String[] args) {
 		// creating a new Server object
 		Server server = new Server();
 		// running the server
